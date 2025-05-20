@@ -81,19 +81,23 @@
 
 @layer components {
   .gradient-text {
-    @apply bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent;
   }
   
   .text-gradient-teal {
     @apply bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-600 bg-clip-text text-transparent;
   }
   
-  .animated-underline {
-    @apply relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-teal-500 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100;
+  .text-gradient-orange {
+    @apply bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent;
   }
   
-  .border-teal-gradient {
-    @apply border-0 bg-gradient-to-r from-teal-500/30 via-cyan-500/40 to-teal-400/30 bg-clip-border;
+  .animated-underline {
+    @apply relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-bottom-right after:scale-x-0 after:bg-amber-500 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100;
+  }
+  
+  .border-amber-gradient {
+    @apply border-0 bg-gradient-to-r from-amber-500/30 via-orange-500/40 to-amber-400/30 bg-clip-border;
   }
   
   .pulse {
@@ -120,6 +124,10 @@
   
   .translate-z-8 {
     transform: translateZ(8px);
+  }
+  
+  .translate-z-4 {
+    transform: translateZ(4px);
   }
   
   .-translate-z-8 {
