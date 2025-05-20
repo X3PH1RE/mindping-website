@@ -13,7 +13,7 @@ const HowItWorksSection: React.FC = () => {
     },
     {
       id: 2,
-      title: "Join any Google Meet",
+      title: "Join any Online Meet",
       description: "We overlay on your existing meetings. No new software to learn.",
       icon: "🎯",
       benefit: "No learning curve",
