@@ -16,17 +16,17 @@ const Index: React.FC = () => {
       <header className="fixed top-0 left-0 right-0 z-50 py-4 px-6 bg-background/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="font-bold text-xl">
-            <span className="text-gradient-primary">MindPing</span>
+            <span className="text-gradient-teal">MindPing</span>
           </div>
           
           <nav className="hidden md:flex space-x-6">
-            <a href="#value-props" className="text-neutral-dark hover:text-primary transition-colors animated-underline">Features</a>
-            <a href="#how-it-works" className="text-neutral-dark hover:text-primary transition-colors animated-underline">How It Works</a>
-            <a href="#testimonials" className="text-neutral-dark hover:text-primary transition-colors animated-underline">Testimonials</a>
+            <a href="#value-props" className="text-neutral-dark hover:text-teal-500 transition-colors animated-underline">Features</a>
+            <a href="#how-it-works" className="text-neutral-dark hover:text-teal-500 transition-colors animated-underline">How It Works</a>
+            <a href="#testimonials" className="text-neutral-dark hover:text-teal-500 transition-colors animated-underline">Testimonials</a>
           </nav>
           
           <div>
-            <button className="bg-primary/10 hover:bg-primary/20 text-primary font-medium px-6 py-2 rounded-full transition-colors">
+            <button className="bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 font-medium px-6 py-2 rounded-full transition-colors">
               Get Started
             </button>
           </div>
