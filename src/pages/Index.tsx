@@ -18,7 +18,6 @@ const Index: React.FC = () => {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="font-bold text-xl flex items-center">
             <span className="text-gradient-orange">MindPing</span>
-            <span className="ml-2 text-xs uppercase bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">For Freelancers</span>
           </div>
           
           <nav className="hidden md:flex space-x-6">

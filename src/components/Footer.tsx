@@ -12,9 +12,6 @@ const Footer: React.FC = () => {
           <div className="md:col-span-2">
             <h3 className="text-xl font-bold mb-4 flex items-center">
               <span className="text-amber-300">MindPing</span>
-              <span className="ml-2 text-xs bg-amber-700/50 text-amber-300 px-2 py-0.5 rounded-full uppercase flex items-center">
-                <Briefcase size={12} className="mr-1" /> For Freelancers
-              </span>
             </h3>
             <p className="text-amber-100/80 mb-4 max-w-md">
               Your AI assistant for client meetings. Never forget what was discussed again.
