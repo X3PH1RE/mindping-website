@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Check, Star, Zap, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ const Pricing = () => {
     },
     {
       name: "Warm Lead",
-      price: "$29",
+      price: "$9.99",
       period: "/month",
       description: "Ideal for active freelancers building client relationships",
       icon: <Zap className="w-6 h-6" />,
@@ -44,7 +43,7 @@ const Pricing = () => {
     },
     {
       name: "Closed Deal",
-      price: "$99",
+      price: "$49.99",
       period: "/month",
       description: "For established freelancers managing multiple clients",
       icon: <Crown className="w-6 h-6" />,
@@ -54,9 +53,7 @@ const Pricing = () => {
         "Custom branding on exports",
         "Team collaboration features",
         "Advanced client reporting",
-        "API access",
         "Custom integrations",
-        "Dedicated account manager",
         "White-label options"
       ],
       buttonText: "Go Pro",
