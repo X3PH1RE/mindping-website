@@ -20,7 +20,7 @@ const HeroSection: React.FC = () => {
     <section className="relative min-h-screen flex items-center justify-center py-20 px-4">
       <FloatingElements />
       
-      <div className="max-w-5xl mx-auto text-center z-10">
+      <div className="max-w-6xl mx-auto text-center z-10">
         <h1 className="mb-8 animate-fade-in">
           <span className="font-bold block mb-2">80% of freelancers</span>
           <div className="relative inline-flex items-center">
@@ -45,9 +45,21 @@ const HeroSection: React.FC = () => {
           Most tools help you catch up. We help you keep up.
         </p>
         
-        <button className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all transform hover:-translate-y-1 hover:shadow-lg animate-fade-in-delayed">
+        <button className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-4 rounded-full text-lg font-medium transition-all transform hover:-translate-y-1 hover:shadow-lg animate-fade-in-delayed mb-12">
           Get the Extension
         </button>
+        
+        {/* Extension Preview Image */}
+        <div className="flex justify-center mb-16 animate-fade-in-delayed">
+          <div className="relative max-w-md mx-auto">
+            <img 
+              src="/lovable-uploads/50f1e472-4ce7-4446-95eb-f16a51b7c1b7.png" 
+              alt="MindPing Browser Extension Preview" 
+              className="w-full h-auto rounded-3xl shadow-2xl border border-gray-200 hover:shadow-3xl transition-shadow duration-300"
+            />
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-amber-500/10 to-transparent pointer-events-none"></div>
+          </div>
+        </div>
         
         <div className="mt-16 flex justify-center animate-fade-in-delayed">
           <a href="#value-props" className="flex flex-col items-center text-neutral-dark hover:text-amber-600 transition-colors">
