@@ -24,6 +24,7 @@ const Index: React.FC = () => {
             <a href="#value-props" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Features</a>
             <a href="#how-it-works" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">How It Works</a>
             <a href="#testimonials" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Testimonials</a>
+            <a href="/pricing" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Pricing</a>
           </nav>
           
           <div>
