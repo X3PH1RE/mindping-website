@@ -3,6 +3,7 @@ import { Check, Star, Zap, Crown, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import AuthDialog from '@/components/AuthDialog';
+import MobileNav from '@/components/MobileNav';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -228,11 +229,11 @@ const Pricing = () => {
           <div className="font-bold text-xl flex items-center min-w-[220px]">
             <span className="text-gradient-orange">MindPing</span>
           </div>
-          <nav className="flex-1 flex justify-start space-x-6 pl-80">
+          <nav className="hidden md:flex flex-1 justify-center space-x-6">
             <a href="/" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Home</a>
             <a href="/pricing" className="text-amber-600 font-medium">Pricing</a>
           </nav>
-          <div className="flex items-center gap-3 min-w-[120px] justify-end">
+          <div className="hidden md:flex items-center gap-3 min-w-[120px] justify-end">
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-neutral-dark hidden sm:block">
@@ -254,6 +255,13 @@ const Pricing = () => {
               </Button>
             )}
           </div>
+
+          <MobileNav 
+            user={user}
+            onAuthClick={() => setShowAuthDialog(true)}
+            onSignOut={handleSignOut}
+            currentPage="pricing"
+          />
         </div>
       </header>
 
