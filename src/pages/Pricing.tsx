@@ -9,6 +9,8 @@ declare global {
   }
 }
 
+const API_BASE = 'https://mindping-website-backend.onrender.com';
+
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [showLogin, setShowLogin] = useState(false);
@@ -30,7 +32,7 @@ const Pricing = () => {
       setLoading(planName);
 
       // Create order
-      const response = await fetch('/api/create-order', {
+      const response = await fetch(`${API_BASE}/api/create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +56,7 @@ const Pricing = () => {
         handler: async function (response: any) {
           try {
             // Verify payment
-            const verifyResponse = await fetch('/api/verify-payment', {
+            const verifyResponse = await fetch(`${API_BASE}/api/verify-payment`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
