@@ -62,7 +62,7 @@ const ValuePropSection: React.FC = () => {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <div className="rounded-2xl bg-white p-8 shadow-lg transform transition-transform hover:-translate-y-2 hover:shadow-xl card-3d border border-amber-100">
             <h3 className="text-xl font-semibold mb-6 text-amber-700 flex items-center">
-              <Briefcase className="mr-2" /> What we solve for freelancers
+              <Briefcase className="mr-2" /> What we solve for freelancers!
             </h3>
             
             <ul className="space-y-4">
