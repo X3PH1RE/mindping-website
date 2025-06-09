@@ -229,7 +229,7 @@ const Pricing = () => {
             <span className="text-gradient-orange">MindPing</span>
           </div>
           
-          <nav className="hidden md:flex space-x-6">
+          <nav className="hidden md:flex space-x-6 flex-1 justify-center">
             <a href="/" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Home</a>
             <a href="/pricing" className="text-amber-600 font-medium">Pricing</a>
           </nav>
