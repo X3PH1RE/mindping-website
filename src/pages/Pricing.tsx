@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Star, Zap, Crown } from 'lucide-react';
+import { Check, Star, Zap, Crown, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import AuthDialog from '@/components/AuthDialog';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 declare global {
   interface Window {
@@ -11,7 +14,9 @@ declare global {
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
-  const [showLogin, setShowLogin] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const { user, loading: authLoading, signOut } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Load Razorpay script
@@ -26,6 +31,12 @@ const Pricing = () => {
   }, []);
 
   const handleSubscription = async (amount: number, planName: string) => {
+    // Check if user is logged in
+    if (!user) {
+      setShowAuthDialog(true);
+      return;
+    }
+
     try {
       setLoading(planName);
 
@@ -73,16 +84,24 @@ const Pricing = () => {
               window.location.href = '/success';
             } else {
               // Payment verification failed
-              alert('Payment verification failed. Please contact support.');
+              toast({
+                title: "Payment Failed",
+                description: "Payment verification failed. Please contact support.",
+                variant: "destructive",
+              });
             }
           } catch (error) {
             console.error('Error:', error);
-            alert('Error verifying payment. Please contact support.');
+            toast({
+              title: "Payment Error",
+              description: "Error verifying payment. Please contact support.",
+              variant: "destructive",
+            });
           }
         },
         prefill: {
           name: '',
-          email: '',
+          email: user?.email || '',
           contact: '',
         },
         theme: {
@@ -94,9 +113,36 @@ const Pricing = () => {
       razorpay.open();
     } catch (error) {
       console.error('Error:', error);
-      alert('Error initiating payment. Please try again.');
+      toast({
+        title: "Error",
+        description: "Error initiating payment. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    toast({
+      title: "Success",
+      description: "You can now purchase a subscription!",
+    });
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed Out",
+        description: "You have been signed out successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Error signing out. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -161,6 +207,17 @@ const Pricing = () => {
     }
   ];
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500 mx-auto"></div>
+          <p className="mt-2 text-neutral-dark">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header */}
@@ -175,10 +232,27 @@ const Pricing = () => {
             <a href="/pricing" className="text-amber-600 font-medium">Pricing</a>
           </nav>
           
-          <div>
-            <Button className="bg-amber-500 hover:bg-amber-600" onClick={() => setShowLogin(true)}>
-              Login
-            </Button>
+          <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-neutral-dark hidden sm:block">
+                  {user.email}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button className="bg-amber-500 hover:bg-amber-600" onClick={() => setShowAuthDialog(true)}>
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -194,6 +268,13 @@ const Pricing = () => {
             <p className="text-xl text-neutral-dark max-w-2xl mx-auto">
               From cold pitches to closed deals, we have the perfect plan to accelerate your freelance journey
             </p>
+            {!user && (
+              <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg max-w-md mx-auto">
+                <p className="text-amber-800 text-sm">
+                  <strong>Note:</strong> Please sign in to purchase a subscription
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Pricing Cards */}
@@ -242,7 +323,7 @@ const Pricing = () => {
                         : ''
                     }`}
                     variant={tier.popular ? 'default' : 'outline'}
-                    onClick={() => tier.amount > 0 && handleSubscription(tier.amount, tier.name)}
+                    onClick={() => handleSubscription(tier.amount, tier.name)}
                     disabled={loading === tier.name}
                   >
                     {loading === tier.name ? 'Processing...' : tier.buttonText}
@@ -276,6 +357,13 @@ const Pricing = () => {
           </div>
         </div>
       </main>
+
+      {/* Auth Dialog */}
+      <AuthDialog 
+        open={showAuthDialog} 
+        onOpenChange={setShowAuthDialog}
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 };
