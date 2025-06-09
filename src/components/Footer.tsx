@@ -52,6 +52,7 @@ const Footer: React.FC = () => {
         
         <div className="border-t border-amber-700/30 mt-10 pt-6 text-center text-amber-300/70 text-sm">
           <p>&copy; {currentYear} MindPing. All rights reserved.</p>
+          <p>Made with 🧠 at <span className="font-bold">SaaSkool</span></p>
         </div>
       </div>
     </footer>
