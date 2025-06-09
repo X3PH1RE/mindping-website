@@ -20,7 +20,7 @@ const Index: React.FC = () => {
             <span className="text-gradient-orange">MindPing</span>
           </div>
           
-          <nav className="hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2">
+          <nav className="hidden md:flex space-x-6 flex-1 justify-center">
             <a href="#value-props" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Features</a>
             <a href="#how-it-works" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">How It Works</a>
             <a href="#testimonials" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Testimonials</a>
