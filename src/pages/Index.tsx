@@ -82,6 +82,7 @@ const Index: React.FC = () => {
       <AuthDialog 
         open={showAuthDialog} 
         onOpenChange={setShowAuthDialog}
+        onSuccess={() => setShowAuthDialog(false)}
       />
     </div>
   );

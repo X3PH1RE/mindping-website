@@ -22,7 +22,7 @@ const HeroSection: React.FC = () => {
       
       <div className="max-w-6xl mx-auto text-center z-10">
         <h1 className="mb-8 animate-fade-in">
-          <span className="font-bold block mb-2">80% of freelancers</span>
+          <span className="font-bold block mb-2">80% of Freelancers</span>
           <div className="relative inline-flex items-center">
             <div 
               className="inline-block text-gradient-orange font-bold mx-1 py-1"
