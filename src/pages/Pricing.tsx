@@ -224,17 +224,15 @@ const Pricing = () => {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 py-4 px-6 bg-background/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="font-bold text-xl flex items-center">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="font-bold text-xl flex items-center min-w-[220px]">
             <span className="text-gradient-orange">MindPing</span>
           </div>
-          
-          <nav className="hidden md:flex space-x-6 flex-1 justify-center">
+          <nav className="flex-1 flex justify-start space-x-6 pl-80">
             <a href="/" className="text-neutral-dark hover:text-amber-500 transition-colors animated-underline">Home</a>
             <a href="/pricing" className="text-amber-600 font-medium">Pricing</a>
           </nav>
-          
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-[120px] justify-end">
             {user ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-neutral-dark hidden sm:block">
