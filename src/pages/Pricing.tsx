@@ -1,9 +1,105 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, Star, Zap, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 const Pricing = () => {
+  const [loading, setLoading] = useState<string | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    // Load Razorpay script
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handleSubscription = async (amount: number, planName: string) => {
+    try {
+      setLoading(planName);
+
+      // Create order
+      const response = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount,
+          planName,
+        }),
+      });
+
+      const order = await response.json();
+
+      // Initialize Razorpay
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'MindPing',
+        description: `${planName} Subscription`,
+        order_id: order.id,
+        handler: async function (response: any) {
+          try {
+            // Verify payment
+            const verifyResponse = await fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verification = await verifyResponse.json();
+
+            if (verification.verified) {
+              // Payment successful
+              window.location.href = '/success';
+            } else {
+              // Payment verification failed
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error verifying payment. Please contact support.');
+          }
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: '',
+        },
+        theme: {
+          color: '#F59E0B',
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error initiating payment. Please try again.');
+    } finally {
+      setLoading(null);
+    }
+  };
+
   const pricingTiers = [
     {
       name: "Cold Pitch",
@@ -13,17 +109,18 @@ const Pricing = () => {
       features: [
         "Basic meeting transcription",
         "Simple note-taking",
-        "5 meetings per month",
+        "5 meetings of 30 minutes each per month",
         "Basic export options",
         "Email support"
       ],
       buttonText: "Get Started Free",
       popular: false,
-      gradient: "from-gray-400 to-gray-600"
+      gradient: "from-gray-400 to-gray-600",
+      amount: 0
     },
     {
       name: "Warm Lead",
-      price: "$9.99",
+      price: "₹749",
       period: "/month",
       description: "Ideal for active freelancers building client relationships",
       icon: <Zap className="w-6 h-6" />,
@@ -39,11 +136,12 @@ const Pricing = () => {
       ],
       buttonText: "Start Warm Lead",
       popular: true,
-      gradient: "from-amber-400 to-orange-500"
+      gradient: "from-amber-400 to-orange-500",
+      amount: 749
     },
     {
       name: "Closed Deal",
-      price: "$49.99",
+      price: "₹2499",
       period: "/month",
       description: "For established freelancers managing multiple clients",
       icon: <Crown className="w-6 h-6" />,
@@ -58,7 +156,8 @@ const Pricing = () => {
       ],
       buttonText: "Go Pro",
       popular: false,
-      gradient: "from-purple-500 to-purple-700"
+      gradient: "from-purple-500 to-purple-700",
+      amount: 2499
     }
   ];
 
@@ -77,7 +176,7 @@ const Pricing = () => {
           </nav>
           
           <div>
-            <Button className="bg-amber-500 hover:bg-amber-600">
+            <Button className="bg-amber-500 hover:bg-amber-600" onClick={() => setShowLogin(true)}>
               Login
             </Button>
           </div>
@@ -99,7 +198,7 @@ const Pricing = () => {
 
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {pricingTiers.map((tier, index) => (
+            {pricingTiers.map((tier) => (
               <Card 
                 key={tier.name} 
                 className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
@@ -143,8 +242,10 @@ const Pricing = () => {
                         : ''
                     }`}
                     variant={tier.popular ? 'default' : 'outline'}
+                    onClick={() => tier.amount > 0 && handleSubscription(tier.amount, tier.name)}
+                    disabled={loading === tier.name}
                   >
-                    {tier.buttonText}
+                    {loading === tier.name ? 'Processing...' : tier.buttonText}
                   </Button>
                 </CardFooter>
               </Card>
@@ -165,7 +266,7 @@ const Pricing = () => {
               </div>
               <div className="text-left">
                 <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
-                <p className="text-neutral-dark">We accept all major credit cards, PayPal, and bank transfers for annual plans.</p>
+                <p className="text-neutral-dark">We accept all major credit cards, UPI, netbanking, and popular wallets through Razorpay.</p>
               </div>
               <div className="text-left">
                 <h3 className="font-semibold mb-2">Can I cancel anytime?</h3>
