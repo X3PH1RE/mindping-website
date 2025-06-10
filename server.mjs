@@ -9,12 +9,8 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load environment variables with explicit path
-const envPath = join(__dirname, '.env');
-console.log('Loading .env from:', envPath);
-dotenv.config({ path: envPath });
+dotenv.config();
 
-// Log environment variables (without sensitive data)
 console.log('Environment variables loaded:', {
   RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID ? 'Set' : 'Not Set',
   RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET ? 'Set' : 'Not Set',
