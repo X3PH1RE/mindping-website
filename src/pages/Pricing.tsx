@@ -181,8 +181,8 @@ const Pricing = () => {
     },
     {
       name: "Closed Deal",
-      price: "₹2499",
-      period: "/month",
+      price: "Coming Soon",
+      period: "",
       description: "For established freelancers managing multiple clients",
       icon: <Crown className="w-6 h-6" />,
       features: [
@@ -194,10 +194,10 @@ const Pricing = () => {
         "Custom integrations",
         "White-label options"
       ],
-      buttonText: "Go Pro",
+      buttonText: "Coming Soon",
       popular: false,
       gradient: "from-purple-500 to-purple-700",
-      amount: 2499
+      amount: 0
     }
   ];
 
@@ -315,18 +315,28 @@ const Pricing = () => {
                 </CardContent>
 
                 <CardFooter>
-                  <Button 
-                    className={`w-full ${
-                      tier.popular 
-                        ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' 
-                        : ''
-                    }`}
-                    variant={tier.popular ? 'default' : 'outline'}
-                    onClick={() => handleSubscription(tier.amount, tier.name)}
-                    disabled={loading === tier.name}
-                  >
-                    {loading === tier.name ? 'Processing...' : tier.buttonText}
-                  </Button>
+                  {tier.buttonText === 'Coming Soon' ? (
+                    <button
+                      className="w-full h-11 bg-gradient-to-r from-purple-500 to-purple-700 text-white opacity-80 cursor-not-allowed animate-pulse rounded-md font-semibold text-base select-none border-none outline-none flex items-center justify-center"
+                      style={{ pointerEvents: 'none' }}
+                      tabIndex={-1}
+                    >
+                      Coming Soon
+                    </button>
+                  ) : (
+                    <Button 
+                      className={`w-full ${
+                        tier.popular 
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' 
+                          : ''
+                      }`}
+                      variant={tier.popular ? 'default' : 'outline'}
+                      onClick={() => handleSubscription(tier.amount, tier.name)}
+                      disabled={loading === tier.name}
+                    >
+                      {loading === tier.name ? 'Processing...' : tier.buttonText}
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             ))}
