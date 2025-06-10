@@ -6,6 +6,7 @@ import AuthDialog from '@/components/AuthDialog';
 import MobileNav from '@/components/MobileNav';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 declare global {
   interface Window {
@@ -34,16 +35,8 @@ const Pricing = () => {
   }, []);
 
   const handleSubscription = async (amount: number, planName: string) => {
-    // Check if user is logged in
-    if (!user) {
-      setShowAuthDialog(true);
-      return;
-    }
-
     try {
       setLoading(planName);
-
-      // Create order
       const response = await fetch(`${API_BASE}/api/create-order`, {
         method: 'POST',
         headers: {
@@ -54,10 +47,7 @@ const Pricing = () => {
           planName,
         }),
       });
-
       const order = await response.json();
-
-      // Initialize Razorpay
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
@@ -67,7 +57,6 @@ const Pricing = () => {
         order_id: order.id,
         handler: async function (response: any) {
           try {
-            // Verify payment
             const verifyResponse = await fetch(`${API_BASE}/api/verify-payment`, {
               method: 'POST',
               headers: {
@@ -79,14 +68,17 @@ const Pricing = () => {
                 razorpay_signature: response.razorpay_signature,
               }),
             });
-
             const verification = await verifyResponse.json();
-
             if (verification.verified) {
-              // Payment successful
+              // Only update Supabase if user is logged in
+              if (user?.id && supabase) {
+                await (supabase as any)
+                  .from('profiles')
+                  .update({ role: 'pro' })
+                  .eq('id', user.id);
+              }
               window.location.href = '/success';
             } else {
-              // Payment verification failed
               toast({
                 title: "Payment Failed",
                 description: "Payment verification failed. Please contact support.",
@@ -111,7 +103,6 @@ const Pricing = () => {
           color: '#F59E0B',
         },
       };
-
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
