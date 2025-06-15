@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Check, Star, Zap, Crown, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,8 +5,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import AuthDialog from '@/components/AuthDialog';
 import MobileNav from '@/components/MobileNav';
 import { useAuth } from '@/hooks/useAuth';
-import { useProfile } from '@/hooks/useProfile';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 declare global {
   interface Window {
@@ -21,7 +20,6 @@ const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { user, loading: authLoading, signOut } = useAuth();
-  const { profile, loading: profileLoading, updateRole, isPro } = useProfile(user);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -37,11 +35,6 @@ const Pricing = () => {
   }, []);
 
   const handleSubscription = async (amount: number, planName: string) => {
-    if (!user) {
-      setShowAuthDialog(true);
-      return;
-    }
-
     try {
       setLoading(planName);
       const response = await fetch(`${API_BASE}/api/create-order`, {
@@ -55,7 +48,6 @@ const Pricing = () => {
         }),
       });
       const order = await response.json();
-      
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
@@ -77,25 +69,15 @@ const Pricing = () => {
               }),
             });
             const verification = await verifyResponse.json();
-            
             if (verification.verified) {
-              // Update user role to pro in Supabase
-              const success = await updateRole('pro', response.razorpay_payment_id);
-              
-              if (success) {
-                toast({
-                  title: "Payment Successful!",
-                  description: "You are now a Pro user! Enjoy your premium features.",
-                });
-                // Redirect to success page or stay on pricing
-                window.location.href = '/success';
-              } else {
-                toast({
-                  title: "Payment Successful",
-                  description: "Payment verified but there was an issue updating your account. Please contact support.",
-                  variant: "destructive",
-                });
+              // Only update Supabase if user is logged in
+              if (user?.id && supabase) {
+                await (supabase as any)
+                  .from('profiles')
+                  .update({ role: 'pro' })
+                  .eq('id', user.id);
               }
+              window.location.href = '/success';
             } else {
               toast({
                 title: "Payment Failed",
@@ -219,7 +201,7 @@ const Pricing = () => {
     }
   ];
 
-  if (authLoading || profileLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -245,18 +227,9 @@ const Pricing = () => {
           <div className="hidden md:flex items-center gap-3 min-w-[120px] justify-end">
             {user ? (
               <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <span className="text-sm text-neutral-dark hidden sm:block">
-                    {user.email}
-                  </span>
-                  {profile && (
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      isPro ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {isPro ? 'Pro' : 'Free'}
-                    </span>
-                  )}
-                </div>
+                <span className="text-sm text-neutral-dark hidden sm:block">
+                  {user.email}
+                </span>
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -301,98 +274,72 @@ const Pricing = () => {
                 </p>
               </div>
             )}
-            {user && isPro && (
-              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg max-w-md mx-auto">
-                <p className="text-green-800 text-sm">
-                  <strong>🎉 You are a Pro user!</strong> Enjoy all premium features.
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {pricingTiers.map((tier) => {
-              const isCurrentPlan = (tier.name === "Cold Pitch" && !isPro) || 
-                                   (tier.name === "Warm Lead" && isPro);
-              
-              return (
-                <Card 
-                  key={tier.name} 
-                  className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
-                    tier.popular ? 'scale-105 border-amber-400 border-2' : ''
-                  } ${isCurrentPlan ? 'ring-2 ring-green-500' : ''}`}
-                >
-                  {tier.popular && (
-                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-center py-2 text-sm font-medium">
-                      Most Popular
-                    </div>
-                  )}
-                  
-                  {isCurrentPlan && (
-                    <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-green-400 to-green-500 text-white text-center py-2 text-sm font-medium">
-                      Your Current Plan
-                    </div>
-                  )}
-                  
-                  <CardHeader className={tier.popular || isCurrentPlan ? 'pt-12' : ''}>
-                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${tier.gradient} flex items-center justify-center text-white mb-4`}>
-                      {tier.icon}
-                    </div>
-                    <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
-                    <CardDescription className="text-neutral-dark">{tier.description}</CardDescription>
-                    <div className="mt-4">
-                      <span className="text-4xl font-bold">{tier.price}</span>
-                      {tier.period && <span className="text-neutral text-lg">{tier.period}</span>}
-                    </div>
-                  </CardHeader>
+            {pricingTiers.map((tier) => (
+              <Card 
+                key={tier.name} 
+                className={`relative overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
+                  tier.popular ? 'scale-105 border-amber-400 border-2' : ''
+                }`}
+              >
+                {tier.popular && (
+                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-center py-2 text-sm font-medium">
+                    Most Popular
+                  </div>
+                )}
+                
+                <CardHeader className={tier.popular ? 'pt-12' : ''}>
+                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${tier.gradient} flex items-center justify-center text-white mb-4`}>
+                    {tier.icon}
+                  </div>
+                  <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
+                  <CardDescription className="text-neutral-dark">{tier.description}</CardDescription>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold">{tier.price}</span>
+                    {tier.period && <span className="text-neutral text-lg">{tier.period}</span>}
+                  </div>
+                </CardHeader>
 
-                  <CardContent>
-                    <ul className="space-y-3">
-                      {tier.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-center gap-3">
-                          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <span className="text-sm">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
+                <CardContent>
+                  <ul className="space-y-3">
+                    {tier.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
 
-                  <CardFooter>
-                    {tier.buttonText === 'Coming Soon' ? (
-                      <button
-                        className="w-full h-11 bg-gradient-to-r from-purple-500 to-purple-700 text-white opacity-80 cursor-not-allowed animate-pulse rounded-md font-semibold text-base select-none border-none outline-none flex items-center justify-center"
-                        style={{ pointerEvents: 'none' }}
-                        tabIndex={-1}
-                      >
-                        Coming Soon
-                      </button>
-                    ) : isCurrentPlan ? (
-                      <Button 
-                        className="w-full"
-                        variant="outline"
-                        disabled
-                      >
-                        Current Plan
-                      </Button>
-                    ) : (
-                      <Button 
-                        className={`w-full ${
-                          tier.popular 
-                            ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' 
-                            : ''
-                        }`}
-                        variant={tier.popular ? 'default' : 'outline'}
-                        onClick={() => handleSubscription(tier.amount, tier.name)}
-                        disabled={loading === tier.name || !user}
-                      >
-                        {loading === tier.name ? 'Processing...' : tier.buttonText}
-                      </Button>
-                    )}
-                  </CardFooter>
-                </Card>
-              );
-            })}
+                <CardFooter>
+                  {tier.buttonText === 'Coming Soon' ? (
+                    <button
+                      className="w-full h-11 bg-gradient-to-r from-purple-500 to-purple-700 text-white opacity-80 cursor-not-allowed animate-pulse rounded-md font-semibold text-base select-none border-none outline-none flex items-center justify-center"
+                      style={{ pointerEvents: 'none' }}
+                      tabIndex={-1}
+                    >
+                      Coming Soon
+                    </button>
+                  ) : (
+                    <Button 
+                      className={`w-full ${
+                        tier.popular 
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600' 
+                          : ''
+                      }`}
+                      variant={tier.popular ? 'default' : 'outline'}
+                      onClick={() => handleSubscription(tier.amount, tier.name)}
+                      disabled={loading === tier.name}
+                    >
+                      {loading === tier.name ? 'Processing...' : tier.buttonText}
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            ))}
           </div>
 
           {/* FAQ Section */}
